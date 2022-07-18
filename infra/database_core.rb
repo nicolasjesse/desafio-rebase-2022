@@ -3,12 +3,12 @@ require 'csv'
 require_relative 'examination_repo.rb'
 
 class DatabaseCore
-  def self.get_connection(database = 'exam-db')
+  def self.get_connection(database='med-db')
     PG::Connection.open(dbname: 'hospital', user: 'exam',
                         password: 'exam', host: database)
   end
 
-  def self.create_or_recreate_tables(connection)
+  def self.create_or_recreate_tables(connection=self.get_connection)
     begin
       schema = "CREATE TABLE examination (
         id SERIAL PRIMARY KEY,
@@ -39,7 +39,7 @@ class DatabaseCore
     end
   end
 
-  def self.populate_tables_from(csv, connection)
+  def self.populate_tables_from(csv, connection=self.get_connection)
     begin
       self.create_or_recreate_tables(connection)
       exam_repo = ExaminationRepo.new(connection)
