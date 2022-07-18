@@ -5,12 +5,22 @@ require_relative './infra/examination_repo.rb'
 require_relative './infra/database_core.rb'
 
 get '/tests' do
-  exam_repo = ExaminationRepo.new(DatabaseCore.get_connection)
-  exam_repo.get_all.values.to_json
+  begin
+    exam_repo = ExaminationRepo.new(DatabaseCore.get_connection)
+    exam_repo.get_all.values.to_json
+  rescue
+    halt 500
+  end
 end
 
 post '/import' do
-  DatabaseCore.populate_tables_from(request.body.string)
+  begin
+    csv = CSV.new(request.body.read, col_sep: ';')
+    DatabaseCore.insert_csv_into_database(csv, DatabaseCore.get_connection)
+    halt 201
+  rescue
+    halt 400
+  end
 end
 
 Rack::Handler::Puma.run(
