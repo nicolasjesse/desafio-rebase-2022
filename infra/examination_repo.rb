@@ -1,5 +1,3 @@
-require_relative 'database_core'
-
 class ExaminationRepo
   def initialize(conn)
     @conn = conn
