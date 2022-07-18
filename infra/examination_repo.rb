@@ -1,8 +1,8 @@
 require_relative 'database_core'
 
 class ExaminationRepo
-  def initialize
-    @conn = DatabaseCore.get_connection
+  def initialize(conn)
+    @conn = conn
   end
 
   def create(examination)

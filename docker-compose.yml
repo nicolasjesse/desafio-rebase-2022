@@ -25,6 +25,16 @@ services:
       - POSTGRES_PASSWORD=exam
     networks:
       - exam
+  test-db:
+    container_name: test-db
+    restart: always
+    image: postgres
+    environment:
+      - POSTGRES_DB=hospital
+      - POSTGRES_USER=exam
+      - POSTGRES_PASSWORD=exam
+    networks:
+      - exam
 volumes:
   pgdata:
   bundleCache:

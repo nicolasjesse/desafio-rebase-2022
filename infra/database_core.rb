@@ -3,14 +3,13 @@ require 'csv'
 require_relative 'examination_repo.rb'
 
 class DatabaseCore
-  def self.get_connection
+  def self.get_connection(database = 'exam-db')
     PG::Connection.open(dbname: 'hospital', user: 'exam',
-                        password: 'exam', host: 'hospital-db')
+                        password: 'exam', host: database)
   end
 
-  def self.create_or_recreate_tables
+  def self.create_or_recreate_tables(connection)
     begin
-      conn = self.get_connection
       schema = "CREATE TABLE examination (
         id SERIAL PRIMARY KEY,
         token VARCHAR(6),
@@ -30,20 +29,20 @@ class DatabaseCore
         type_limit VARCHAR NOT NULL,
         result VARCHAR NOT NULL
       );"
-      conn.exec(schema)
+      connection.exec(schema)
       return true
     rescue PG::DuplicateTable
-      conn.exec('DROP TABLE IF EXISTS examination')
-      self.create_or_recreate_tables
+      connection.exec('DROP TABLE IF EXISTS examination')
+      self.create_or_recreate_tables(connection)
     rescue
       return false
     end
   end
 
-  def self.populate_tables_from(csv_path)
+  def self.populate_tables_from(csv_path, connection)
     begin
-      self.create_or_recreate_tables
-      exam_repo = ExaminationRepo.new
+      self.create_or_recreate_tables(connection)
+      exam_repo = ExaminationRepo.new(connection)
       CSV.read(csv_path, col_sep: ';').drop(1).each do |row|
         exam_repo.create(row)
       end
