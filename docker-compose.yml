@@ -1,0 +1,42 @@
+version: "3.9"
+services:
+  exam-app:
+    container_name: hospital-webserver
+    restart: always
+    image: ruby
+    working_dir: /app
+    volumes:
+      - .:/app
+      - bundleCache:/usr/local/bundle
+    command: bash -c "gem install rack sinatra puma pg && ruby server.rb"
+    ports:
+      - "3000:3000"
+    networks:
+      - exam
+  med-db:
+    container_name: hospital-db
+    restart: always
+    image: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=hospital
+      - POSTGRES_USER=exam
+      - POSTGRES_PASSWORD=exam
+    networks:
+      - exam
+  test-db:
+    container_name: test-db
+    restart: always
+    image: postgres
+    environment:
+      - POSTGRES_DB=hospital
+      - POSTGRES_USER=exam
+      - POSTGRES_PASSWORD=exam
+    networks:
+      - exam
+volumes:
+  pgdata:
+  bundleCache:
+networks:
+  exam:
