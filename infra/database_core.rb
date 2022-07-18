@@ -39,11 +39,11 @@ class DatabaseCore
     end
   end
 
-  def self.populate_tables_from(csv_path, connection)
+  def self.populate_tables_from(csv, connection)
     begin
       self.create_or_recreate_tables(connection)
       exam_repo = ExaminationRepo.new(connection)
-      CSV.read(csv_path, col_sep: ';').drop(1).each do |row|
+      CSV.read(csv, col_sep: ';').drop(1).each do |row|
         exam_repo.create(row)
       end
       return true

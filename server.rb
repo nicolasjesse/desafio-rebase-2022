@@ -2,10 +2,15 @@ require 'sinatra'
 require 'rack/handler/puma'
 require 'csv'
 require_relative './infra/examination_repo.rb'
+require_relative './infra/database_core.rb'
 
 get '/tests' do
   exam_repo = ExaminationRepo.new
   exam_repo.get_all.values.to_json
+end
+
+post '/import' do
+  DatabaseCore.populate_tables_from(request.body.string)
 end
 
 Rack::Handler::Puma.run(
