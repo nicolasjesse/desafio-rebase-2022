@@ -40,7 +40,6 @@ And Response something like:
 [
   ["1","ABCD12","B000BJ20J4","Maria Luiza Pires","denna@wisozk.biz","PI","048.973.170-88","Emilly Batista Neto","gerald.crona@ebert-quigley.com","2001-03-11","165 Rua Rafaela","Ituverava","Alagoas","2021-08-05","hemácias","45-52","97"],
   ["2","0W9I67","B0002IQM66","Maria Helena Ramalho","rayford@kemmer-kunze.info","SC","048.108.026-04","Juliana dos Reis Filho","mariana_crist@kutch-torp.com","1995-07-03","527 Rodovia Júlio","Lagoa da Canoa","Paraíba","2021-07-09","hdl","19-75","74"]
-  ...
 ]
 ```
 
