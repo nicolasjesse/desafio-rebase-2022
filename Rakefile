@@ -11,7 +11,8 @@ task :populate_from_csv do
 end
 
 desc 'resets all database tables'
-task :reset_database do
-  DatabaseCore.drop_tables
-  DatabaseCore.build_tables
+task :reset_database, [:db] do |t, args|
+  args.with_defaults(:db => 'med-db')
+  DatabaseCore.drop_tables(DatabaseCore.get_connection(args[:db]))
+  DatabaseCore.build_tables(DatabaseCore.get_connection(args[:db]))
 end

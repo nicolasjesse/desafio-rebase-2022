@@ -1,6 +1,12 @@
 require 'test/unit'
+require 'rake'
 require_relative './infra/database_core.rb'
 require_relative './infra/examination_repo.rb'
+
+Test::Unit.at_start do
+  DatabaseCore.drop_tables(DatabaseCore.get_connection('test-db'))
+  DatabaseCore.build_tables(DatabaseCore.get_connection('test-db'))
+end
 
 class DatabaseCoreTest < Test::Unit::TestCase
   def test_connection
@@ -73,7 +79,7 @@ class ExaminationRepoTest < Test::Unit::TestCase
     exam_repo.create(examination1)
     exam_repo.create(examination2)
 
-    result = exam_repo.get_all.values
+    result = exam_repo.get_all
     result_tokens = result.map { |row| row[1] }
     
     assert result_tokens.include?('PKDG94')
