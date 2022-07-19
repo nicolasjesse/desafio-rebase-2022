@@ -5,6 +5,7 @@ class ExaminationRepo
 
   def create(examination)
     begin
+      raise if examination.length != 16
       @conn.exec_params("INSERT INTO examination (
         patient_code, patient_name,
         patient_email, patient_birth_date,
@@ -27,10 +28,9 @@ class ExaminationRepo
   def get_all
     begin
       result = @conn.exec("SELECT * FROM examination;")
+      result.values
     rescue => exception
       raise exception
-    ensure
-      [] unless result
     end
   end
 end

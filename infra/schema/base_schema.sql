@@ -1,4 +1,4 @@
-CREATE TABLE examination (
+CREATE TABLE IF NOT EXISTS examination (
   id SERIAL PRIMARY KEY,
   token VARCHAR(6),
   doctor_code VARCHAR(10),
