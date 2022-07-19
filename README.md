@@ -56,7 +56,7 @@ post ('localhost:3000/import', body: csv_file)
 
 The csv_file variable should contain an CSV file on the following format:
 
-```js
+```csv
 patient_code;patient_name;patient_email;patient_birthday;patient_street;patient_city;patient_state;doctor_number;doctor_state;doctor_name;doctor_email;exam_token;exam_date;exam_type;exam_type_limit;exam_result
 083.892.729-70;João Samuel Garcês;madonna@gerhold-bode.io;1967-07-06;s/n Rua Bento;Taubaté;Pará;B000BJ8TIA;PR;Ana Sophia Aparício Neto;corene.hane@pagac.io;EMHUW2;2021-04-20;tsh;25-80;40
 009.898.217-65;João Guilherme Palmeira;hermelinda.swaniawski@klocko.biz;1961-06-01;9731 Viela Arthur Pereira;Barra de São Francisco;Paraíba;B000HB2O2O;ES;Núbia Godins;christy_dickinson@langworth.org;7Y35FE;2021-07-16;leucócitos;9-61;12
