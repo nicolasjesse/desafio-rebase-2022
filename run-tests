@@ -1,2 +1,2 @@
 #!/bin/bash
-docker-compose run exam-app bash -c "ruby tests.rb" 
+docker-compose run exam-app bash -c "ruby tests/tests.rb" 
