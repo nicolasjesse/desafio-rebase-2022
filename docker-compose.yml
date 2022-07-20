@@ -1,21 +1,32 @@
 version: "3.9"
 services:
-  exam-app:
-    container_name: hospital-webserver
-    restart: always
+  upload-worker:
+    container_name: upload-worker
+    restart: unless-stopped
     image: ruby
     working_dir: /app
     volumes:
       - .:/app
       - bundle:/usr/local/bundle
-    command: bash -c "gem install rake rack sinatra puma pg && rake build_schema && ruby server.rb"
+    command: bash -c "sidekiq -r ./upload_worker.rb"
+    networks:
+      - exam
+  exam-app:
+    container_name: hospital-webserver
+    restart: unless-stopped
+    image: ruby
+    working_dir: /app
+    volumes:
+      - .:/app
+      - bundle:/usr/local/bundle
+    command: bash -c "gem install rake sidekiq rack sinatra puma pg && rake build_schema && ruby server.rb"
     ports:
       - "3000:3000"
     networks:
       - exam
   med-db:
     container_name: hospital-db
-    restart: always
+    restart: unless-stopped
     image: postgres
     volumes:
       - pgdata:/var/lib/postgresql/data
@@ -27,12 +38,18 @@ services:
       - exam
   test-db:
     container_name: test-db
-    restart: always
+    restart: unless-stopped
     image: postgres
     environment:
       - POSTGRES_DB=hospital
       - POSTGRES_USER=exam
       - POSTGRES_PASSWORD=exam
+    networks:
+      - exam
+  redis:
+    container_name: redis-queue
+    restart: unless-stopped
+    image: redis
     networks:
       - exam
 volumes:
