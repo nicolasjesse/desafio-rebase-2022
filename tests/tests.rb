@@ -1,22 +1,25 @@
 require 'test/unit'
 require 'rake'
-require_relative './infra/database_core.rb'
-require_relative './infra/examination_repo.rb'
+require 'csv'
+require_relative '../infra/database_core.rb'
+require_relative '../infra/examination_repo.rb'
 
-Test::Unit.at_start do
-  DatabaseCore.drop_tables(DatabaseCore.get_connection('test-db'))
-  DatabaseCore.build_tables(DatabaseCore.get_connection('test-db'))
-end
 
 class DatabaseCoreTest < Test::Unit::TestCase
+  def setup
+    DatabaseCore.drop_tables(DatabaseCore.get_connection('test-db'))
+    DatabaseCore.build_tables(DatabaseCore.get_connection('test-db'))
+  end
+
   def test_connection
     conn = DatabaseCore.get_connection('test-db')
 
     assert_equal conn.class, PG::Connection
   end
 
-  def test_build_tables_if_table_dont_exists
+  def test_build_tables
     conn = DatabaseCore.get_connection('test-db')
+    DatabaseCore.drop_tables(conn)
     method_result = DatabaseCore.build_tables(conn)
     tables = conn.exec('SELECT * FROM information_schema.tables;')
     public_table_names = tables.values.select { |all_tables| all_tables.include?("public") }.map { |public_tables| public_tables[2] }
@@ -25,15 +28,24 @@ class DatabaseCoreTest < Test::Unit::TestCase
     assert method_result
   end
 
-  def test_build_tables_if_table_exists
+  def test_drop_tables
     conn = DatabaseCore.get_connection('test-db')
-    DatabaseCore.build_tables(conn)
-    method_result = DatabaseCore.build_tables(conn)
+
+    DatabaseCore.drop_tables(conn)
     tables = conn.exec('SELECT * FROM information_schema.tables;')
     public_table_names = tables.values.select { |all_tables| all_tables.include?("public") }.map { |public_tables| public_tables[2] }
 
-    assert public_table_names.include?("examination")
-    assert method_result
+    assert !public_table_names.include?("examination")
+  end
+
+  def test_insert_csv
+    conn = DatabaseCore.get_connection('test-db')
+    csv = CSV.read('./csv_data/test-data.csv', col_sep: ';')
+    result_before = conn.exec('SELECT * FROM examination;').values
+    DatabaseCore.insert_csv(csv, conn)
+    result_after = conn.exec('SELECT * FROM examination;').values
+
+    assert (result_after.length - result_before.length) == 2
   end
 
   def test_populate_tables_from_csv
@@ -48,6 +60,11 @@ class DatabaseCoreTest < Test::Unit::TestCase
 end
 
 class ExaminationRepoTest < Test::Unit::TestCase
+  def setup
+    DatabaseCore.drop_tables(DatabaseCore.get_connection('test-db'))
+    DatabaseCore.build_tables(DatabaseCore.get_connection('test-db'))
+  end
+
   def test_create
     conn = DatabaseCore.get_connection('test-db')
     exam_repo = ExaminationRepo.new(conn)
@@ -76,14 +93,15 @@ class ExaminationRepoTest < Test::Unit::TestCase
       '1999-09-16', '14 Rua José', 'Atiguitinga', 'Roraima', 'B123BJ20J4', 'RO',
       'Teo Lopes', 'talla@ponto.biz', 'DABC56', '2021-08-08', 'hemácias',
       '45-52', '68']
+
+    result_before = exam_repo.get_all
     exam_repo.create(examination1)
     exam_repo.create(examination2)
-
-    result = exam_repo.get_all
-    result_tokens = result.map { |row| row[1] }
+    result_after = exam_repo.get_all
+    result_tokens = result_after.map { |row| row[1] }
     
     assert result_tokens.include?('PKDG94')
     assert result_tokens.include?('DABC56')
-    assert result.length != 0
+    assert (result_after.length - result_before.length) == 2
   end
 end
