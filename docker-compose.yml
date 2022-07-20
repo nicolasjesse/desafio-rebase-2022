@@ -7,8 +7,8 @@ services:
     working_dir: /app
     volumes:
       - .:/app
-      - bundleCache:/usr/local/bundle
-    command: bash -c "gem install rack sinatra puma pg && ruby server.rb"
+      - bundle:/usr/local/bundle
+    command: bash -c "gem install rake rack sinatra puma pg && rake build_schema && ruby server.rb"
     ports:
       - "3000:3000"
     networks:
@@ -37,6 +37,6 @@ services:
       - exam
 volumes:
   pgdata:
-  bundleCache:
+  bundle:
 networks:
   exam:
