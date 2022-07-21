@@ -9,15 +9,27 @@ get '/tests' do
     exam_repo = ExaminationRepo.new(DatabaseCore.get_connection)
     exam_repo.get_all.to_json
   rescue
+    { message: 'Something happened, try again' }.to_json
     halt 500
+  end
+end
+
+get '/tests/:token' do |token|
+  begin
+    exam_repo = ExaminationRepo.new(DatabaseCore.get_connection)
+    body exam_repo.get_by_token(token).to_json
+    halt 200
+  rescue => exception
+    halt 404, { message: 'Not Found' }.to_json
   end
 end
 
 post '/import' do
   begin
-    halt 201 if UploadWorker.perform_async(request.body.read)
+    UploadWorker.perform_async(request.body.read)
+    halt 201, { message: 'Imported sucessfully' }.to_json
   rescue
-    halt 400
+    halt 400, { message: 'Invalid CSV format' }.to_json
   end
 end
 
