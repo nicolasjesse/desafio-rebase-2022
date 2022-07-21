@@ -1,6 +1,6 @@
 require 'sinatra'
 require 'rack/handler/puma'
-require 'csv'
+require_relative './upload_worker.rb'
 require_relative './infra/examination_repo.rb'
 require_relative './infra/database_core.rb'
 
@@ -15,8 +15,7 @@ end
 
 post '/import' do
   begin
-    csv = CSV.new(request.body.read, col_sep: ';')
-    halt 201 if DatabaseCore.insert_csv(csv)
+    halt 201 if UploadWorker.perform_async(request.body.read)
   rescue
     halt 400
   end
