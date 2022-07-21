@@ -1,16 +1,5 @@
 version: "3.9"
 services:
-  upload-worker:
-    container_name: upload-worker
-    restart: unless-stopped
-    image: ruby
-    working_dir: /app
-    volumes:
-      - .:/app
-      - bundle:/usr/local/bundle
-    command: bash -c "sidekiq -r ./upload_worker.rb"
-    networks:
-      - exam
   exam-app:
     container_name: hospital-webserver
     restart: unless-stopped
@@ -22,6 +11,30 @@ services:
     command: bash -c "gem install rake sidekiq rack sinatra puma pg && rake build_schema && ruby server.rb"
     ports:
       - "3000:3000"
+    networks:
+      - exam
+  worker-dashboard:
+    container_name: dashboard
+    restart: unless-stopped
+    image: ruby
+    working_dir: /app
+    volumes:
+      - .:/app
+      - bundle:/usr/local/bundle
+    command: bash -c "rackup config.ru -o 0.0.0.0"
+    ports:
+      - "9292:9292"
+    networks:
+      - exam
+  upload-worker:
+    container_name: upload-worker
+    restart: unless-stopped
+    image: ruby
+    working_dir: /app
+    volumes:
+      - .:/app
+      - bundle:/usr/local/bundle
+    command: bash -c "sidekiq -r ./upload_worker.rb"
     networks:
       - exam
   med-db:
