@@ -14,6 +14,9 @@ The application is made to provide reading and insertion of medical exams data. 
 $ bash run
 ```
 
+Application server will run on port 3000
+Sidekiq Dashboard server will run on port 9292
+
 ## Tests
 
 Still in work an optimal way to run the tests.
