@@ -82,6 +82,28 @@ class ExaminationRepoTest < Test::Unit::TestCase
     assert result
   end
 
+  def test_get_by_token
+    conn = DatabaseCore.get_connection('test-db')
+    exam_repo = ExaminationRepo.new(conn)
+    examination1 = ['048.973.170-33', 'Emillo Batista Neto', 'geralda.crona@ebert-quigley.com',
+      '2001-03-11', '165 Rua Rafaela', 'Ituverava', 'Alagoas', 'C001BJ20J4', 'PB',
+      'Maria Luiza Pires', 'donno@wisozk.biz', 'PKDG94', '2021-08-05', 'hemácias',
+      '45-52', '97']
+    examination2 = ['049.623.830-27', 'Janaina Pereira', 'antonio@email.com',
+      '1999-09-16', '14 Rua José', 'Atiguitinga', 'Roraima', 'B123BJ20J4', 'RO',
+      'Teo Lopes', 'talla@ponto.biz', 'DABC56', '2021-08-08', 'hemácias',
+      '45-52', '68']
+    
+    exam_repo.create(examination1)
+    exam_repo.create(examination2)
+
+    result = exam_repo.get_by_token('PKDG94')
+
+    assert_equal result[:cpf], '048.973.170-33'
+    assert_equal result[:doctor][:crm], 'C001BJ20J4'
+    assert_equal result[:result_date], '2021-08-05'
+  end
+
   def test_get_all
     conn = DatabaseCore.get_connection('test-db')
     exam_repo = ExaminationRepo.new(conn)
